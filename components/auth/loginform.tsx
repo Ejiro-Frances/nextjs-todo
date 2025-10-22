@@ -30,7 +30,7 @@ const LoginForm = () => {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      router.push("/tasks");
+      router.push("/all-tasks");
       toast.success(`Welcome back, ${data.user.name}!`);
       setUser(data.user);
       setAccessToken(data.accessToken);

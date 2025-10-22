@@ -5,16 +5,54 @@ import { useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/services/taskservices";
 import type { Task } from "@/types/types";
 import { Button } from "../ui/button";
+import TaskItem from "./taskitem";
 
-export const TaskList = () => {
-  const useTasks = (page = 1) => {
-    return useQuery({
-      queryKey: ["tasks", page],
-      queryFn: () => getTasks(page),
-      //   placeholderData: keepPreviousData,
-    });
-  };
+type EditableTaskFields = {
+  name: string;
+  description: string | null;
+  priority: Task["priority"];
+  status: Task["status"];
+  tags: string[] | null;
+};
 
+type Props = {
+  tasks?: Task[]; // Optional if fetched from API instead of passed down
+  editingTaskId: string | null;
+  editForms: Record<string, EditableTaskFields>;
+  onEditChange: (
+    id: string,
+    field: keyof EditableTaskFields,
+    value: string
+  ) => void;
+  onSaveEdit: (id: string) => void;
+  onCancelEdit: () => void;
+  onEdit: (task: Task) => void;
+  onDelete: (id: string) => void;
+  onToggle: (task: Task) => void;
+  updatingTaskId: string | null;
+  deletingTaskId: string | null;
+};
+
+// Custom hook for fetching tasks
+const useTasks = (page = 1) => {
+  return useQuery({
+    queryKey: ["tasks", page],
+    queryFn: () => getTasks(page),
+  });
+};
+
+export const TaskList: React.FC<Props> = ({
+  editingTaskId,
+  editForms,
+  onEditChange,
+  onSaveEdit,
+  onCancelEdit,
+  onEdit,
+  onDelete,
+  onToggle,
+  updatingTaskId,
+  deletingTaskId,
+}) => {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError } = useTasks(page);
 
@@ -22,46 +60,39 @@ export const TaskList = () => {
   if (isError)
     return <p className="text-center text-red-500">Error fetching tasks.</p>;
 
-  const tasks = data?.data ?? [];
+  const fetchedTasks: Task[] = data?.data ?? [];
   const meta = data?.meta;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">All Tasks</h1>
-
-      {tasks.length === 0 ? (
-        <p>No tasks found.</p>
+      {fetchedTasks.length === 0 ? (
+        <p className="text-center">No tasks found.</p>
       ) : (
-        <ul className="space-y-3">
-          {tasks.map((task: Task) => (
-            <li
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 md:gap-10 mx-5 md:mx-10">
+          {fetchedTasks.map((task) => (
+            <TaskItem
               key={task.id}
-              className="p-4 border rounded-lg hover:bg-gray-50 transition"
-            >
-              <h2 className="font-semibold text-lg">{task.title}</h2>
-              <p className="text-sm text-gray-500">{task.content}</p>
-              <p className="text-xs text-gray-400">Status: {task.status}</p>
-            </li>
+              task={task}
+              isEditing={editingTaskId === task.id}
+              editForm={editForms[task.id]}
+              onChange={(field, value) => onEditChange(task.id, field, value)}
+              onSave={() => onSaveEdit(task.id)}
+              onCancel={onCancelEdit}
+              onEdit={() => onEdit(task)}
+              onDelete={() => onDelete(task.id)}
+              onToggle={() => onToggle(task)}
+              isBusy={updatingTaskId === task.id || deletingTaskId === task.id}
+              className={`h-full px-4 py-5 border border-l-8 rounded-xl ${
+                task.status === "DONE"
+                  ? "border-[#0EA420]"
+                  : task.status === "TODO"
+                  ? "border-[#F42D2D]"
+                  : "border-purple-600"
+              }`}
+            />
           ))}
-        </ul>
+        </div>
       )}
-
-      <div className="flex justify-between mt-4">
-        <Button
-          variant="outline"
-          onClick={() => setPage((p) => p - 1)}
-          disabled={!meta?.hasPreviousPage}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => setPage((p) => p + 1)}
-          disabled={!meta?.hasNextPage}
-        >
-          Next
-        </Button>
-      </div>
     </div>
   );
 };

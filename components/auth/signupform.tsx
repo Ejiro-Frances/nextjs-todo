@@ -14,7 +14,6 @@ import { toast } from "sonner";
 
 import { useAuthStore } from "@/stores/authstore";
 import axios from "axios";
-import { da } from "zod/v4/locales";
 
 export const SignupForm = () => {
   const { setAccessToken, setUser } = useAuthStore();
@@ -37,7 +36,7 @@ export const SignupForm = () => {
       setAccessToken(data.accessToken);
       console.log(data.accessToken);
 
-      router.push("/tasks");
+      router.push("/all-tasks");
       reset();
     },
     onError: (error) => {

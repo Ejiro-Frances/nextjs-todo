@@ -1,20 +1,28 @@
 export type Priority = "LOW" | "MEDIUM" | "HIGH";
-export type Status = "DRAFT" | "PUBLISHED" | "ARCHIVED" | "CANCELLED";
+export type Status = "TODO" | "IN_PROGRESS" | "DONE" | "CANCELLED";
 
 export interface Task {
   id: string;
-  title: string;
-  content: string | null;
-  // priority: Priority;
+  name: string;
+  description: string | null;
+  priority: Priority;
   status: Status;
-  // archived: boolean;
-  // parentId: string | null;
-  // children: string | string[];
-  // tags: string[] | null;
-  // completedAt: string | null;
-  // createdAt: string;
-  // updatedAt: string;
+  archived: boolean;
+  parentId: string | null;
+  children: string | string[];
+  tags: string[] | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export type EditableTaskFields = {
+  name: string;
+  description: string | null;
+  priority: Priority;
+  status: Status;
+  tags: string[] | null;
+};
 
 export interface CreateTaskRequest {
   name: string;
@@ -50,7 +58,7 @@ export interface UpdateTaskRequest {
   description?: string | null;
   tags?: string[] | null;
   priority?: Priority;
-  status?: "TODO" | "IN_PROGRESS" | "DONE";
+  status?: Status;
   archived?: boolean;
   completedAt?: string | null;
 }
@@ -76,5 +84,5 @@ export interface EditTaskFormState {
   description: string;
   tags: string[];
   priority: Priority;
-  status: "TODO" | "IN_PROGRESS" | "DONE";
+  status: Status;
 }
