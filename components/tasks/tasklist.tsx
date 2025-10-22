@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/services/taskservices";
-
+import type { Task } from "@/types/types";
 import { Button } from "../ui/button";
 
 export const TaskList = () => {
@@ -33,7 +33,7 @@ export const TaskList = () => {
         <p>No tasks found.</p>
       ) : (
         <ul className="space-y-3">
-          {tasks.map((task) => (
+          {tasks.map((task: Task) => (
             <li
               key={task.id}
               className="p-4 border rounded-lg hover:bg-gray-50 transition"
