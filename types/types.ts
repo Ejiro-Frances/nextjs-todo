@@ -10,7 +10,7 @@ export interface Task {
   archived: boolean;
   parentId: string | null;
   children: string | string[];
-  tags: string[] | null;
+  tags: string | null;
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -27,7 +27,7 @@ export type EditableTaskFields = {
 export interface CreateTaskRequest {
   name: string;
   description?: string | null;
-  tags?: string[] | null;
+  tags?: string | null;
   priority?: Priority;
   status?: Status;
   archived?: boolean;
@@ -47,7 +47,7 @@ export interface createTaskResponse {
   parentId: null;
   children: string;
   owner: null;
-  tags: string[];
+  tags: string;
   completedAt: null;
   createdAt: null;
   updatedAt: null;

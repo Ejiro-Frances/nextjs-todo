@@ -10,7 +10,7 @@ import { useTaskOperations } from "@/hooks/useTaskOperations";
 import { Trash2, Pencil } from "lucide-react";
 
 import { Button } from "../ui/button";
-import TaskEditForm from "./taskeditform";
+import EditTaskForm from "./edittaskform";
 import { toast } from "sonner";
 
 type TaskDetailsCardProps = {
@@ -29,7 +29,12 @@ const TaskDetailsCard: React.FC<TaskDetailsCardProps> = ({ task }) => {
     handleSaveEdit,
     handleCancelEdit,
     handleDeleteTask: originalHandleDeleteTask,
-  } = useTaskOperations();
+  } = useTaskOperations({
+    page: 1,
+    limit: 10,
+    status: undefined,
+    search: undefined,
+  });
 
   const handleDeleteTask = async (taskId: string) => {
     try {
@@ -48,7 +53,7 @@ const TaskDetailsCard: React.FC<TaskDetailsCardProps> = ({ task }) => {
   return (
     <div className="border border-[#E4E4E7] m-4 p-4 md:p-8 my-28 rounded-md shadow">
       {editingTask === task.id ? (
-        <TaskEditForm
+        <EditTaskForm
           editForm={editForms[task.id]}
           onChange={(field, value) => handleEditChange(task.id, field, value)}
           onSave={() => handleSaveEdit(task.id)}
