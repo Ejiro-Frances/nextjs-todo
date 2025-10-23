@@ -11,11 +11,11 @@ export function useAuthGuard({ requireAuth = false } = {}) {
     if (process.env.NODE_ENV !== "production") return;
 
     if (requireAuth && !accessToken) {
-      router.replace("/login");
+      router.replace("/");
     }
 
     if (!requireAuth && accessToken) {
-      router.replace("/tasks");
+      router.replace("/all-tasks");
     }
   }, [accessToken, requireAuth, router]);
 }
