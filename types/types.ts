@@ -21,7 +21,7 @@ export type EditableTaskFields = {
   description: string | null;
   priority: Priority;
   status: Status;
-  tags: string[] | null;
+  tags: string | null;
 };
 
 export interface CreateTaskRequest {
@@ -56,7 +56,7 @@ export interface createTaskResponse {
 export interface UpdateTaskRequest {
   name?: string;
   description?: string | null;
-  tags?: string[] | null;
+  tags?: string | null;
   priority?: Priority;
   status?: Status;
   archived?: boolean;
@@ -82,7 +82,7 @@ export type SingleTaskApiResponse = {
 export interface EditTaskFormState {
   name: string;
   description: string;
-  tags: string[];
+  tags: string;
   priority: Priority;
   status: Status;
 }

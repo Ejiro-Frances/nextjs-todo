@@ -12,14 +12,6 @@ type Props = {
   className?: string;
 };
 
-// type Props = {
-//   editForm: any;
-//   onChange: (field: string, value: string) => void;
-//   onSave: () => void;
-//   onCancel: () => void;
-//   className?: string;
-// };
-
 const EditTaskForm: React.FC<Props> = ({
   editForm,
   onChange,
@@ -69,7 +61,7 @@ const EditTaskForm: React.FC<Props> = ({
           <label className="text-sm block mb-1">Tag</label>
           <input
             type="text"
-            value={(editForm.tags && editForm.tags.join(", ")) ?? ""}
+            value={editForm.tags ?? ""}
             onChange={(e) => onChange("tags", e.target.value)}
             className="w-full border p-2"
             placeholder="Tags"

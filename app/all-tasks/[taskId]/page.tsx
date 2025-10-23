@@ -24,13 +24,14 @@ export default function TaskDetailsPage() {
     data: taskResponse,
     isLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: ["task", taskId],
     queryFn: () => getTask(taskId as string),
     enabled: !!taskId,
   });
 
-  const task = taskResponse?.data ?? taskResponse;
+  const task = taskResponse?.data;
 
   // ✅ Loading state
   if (isLoading) {
@@ -58,8 +59,16 @@ export default function TaskDetailsPage() {
           <div className="bg-red-50 border border-red-200 rounded-xl p-6">
             <h2 className="text-red-800 font-semibold mb-2">Task Not Found</h2>
             <p className="text-red-600">
-              The task you’re looking for doesn’t exist or has been deleted.
+              The task you're looking for doesn't exist or has been deleted.
             </p>
+            {error && (
+              <details className="mt-4">
+                <summary className="text-red-700 cursor-pointer">Error Details</summary>
+                <pre className="mt-2 text-xs text-red-600 bg-red-100 p-2 rounded overflow-auto">
+                  {JSON.stringify(error, null, 2)}
+                </pre>
+              </details>
+            )}
           </div>
         </main>
       </>

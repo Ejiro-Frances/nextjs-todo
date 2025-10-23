@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import TaskStatusBadge from "./taskstatusbadge";
 import EditTaskForm from "./edittaskform";
-import type { Task } from "@/types/types";
+import type { Task, EditableTaskFields } from "@/types/types";
 
 import {
   Tooltip,
@@ -31,8 +31,8 @@ import {
 type Props = {
   task: Task;
   isEditing: boolean;
-  editForm: Pick<Task, "name" | "description" | "priority" | "tags" | "status">;
-  onChange: (field: keyof Props["editForm"], value: string) => void;
+  editForm: EditableTaskFields;
+  onChange: (field: keyof EditableTaskFields, value: string) => void;
   onSave: () => void;
   onCancel: () => void;
   onEdit: () => void;
@@ -121,7 +121,7 @@ const TaskItem: React.FC<Props> = ({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link
-                        href={`/task/${task.id}`}
+                        href={`/all-tasks/${task.id}`}
                         className="flex items-center gap-2"
                       >
                         <PanelLeftOpen />

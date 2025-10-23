@@ -54,7 +54,13 @@ const TaskDetailsCard: React.FC<TaskDetailsCardProps> = ({ task }) => {
     <div className="border border-[#E4E4E7] m-4 p-4 md:p-8 my-28 rounded-md shadow">
       {editingTask === task.id ? (
         <EditTaskForm
-          editForm={editForms[task.id]}
+          editForm={editForms[task.id] || {
+            name: task.name,
+            description: task.description,
+            priority: task.priority,
+            status: task.status,
+            tags: task.tags,
+          }}
           onChange={(field, value) => handleEditChange(task.id, field, value)}
           onSave={() => handleSaveEdit(task.id)}
           onCancel={handleCancelEdit}

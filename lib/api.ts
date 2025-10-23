@@ -18,7 +18,7 @@ interface FailedRequest {
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
   headers: { "Content-Type": "application/json" },
 });
 
@@ -27,8 +27,9 @@ const refresh = async (
   accessToken: string,
   refreshToken: string
 ): Promise<RefreshResponse> => {
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api";
   const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+    `${baseURL}/auth/refresh`,
     { refreshToken }, // body
     {
       headers: {

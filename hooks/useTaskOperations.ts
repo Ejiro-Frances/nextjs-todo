@@ -7,6 +7,7 @@ import {
   type Task,
   type UpdateTaskRequest,
   type EditTaskFormState,
+  type EditableTaskFields,
   type CreateTaskRequest,
   type TaskApiResponse,
 } from "@/types/types";
@@ -24,7 +25,7 @@ export const useTaskOperations = (params: {
 
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [editForms, setEditForms] = useState<
-    Partial<Record<string, EditTaskFormState>>
+    Partial<Record<string, EditableTaskFields>>
   >({});
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
@@ -152,8 +153,8 @@ export const useTaskOperations = (params: {
 
     const updates: UpdateTaskRequest = {
       name: editForm.name.trim(),
-      description: editForm.description.trim() || null,
-      tags: editForm.tags.trim() || null, // ✅ backend expects string | null
+      description: editForm.description?.trim() || null,
+      tags: editForm.tags?.trim() || null, // ✅ backend expects string | null
       priority: editForm.priority,
       status: editForm.status,
     };

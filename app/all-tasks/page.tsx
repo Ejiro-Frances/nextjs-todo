@@ -8,6 +8,7 @@ import { useTaskOperations } from "@/hooks/useTaskOperations";
 import { paginationConfig } from "@/constants/pagination-config";
 import { getTasksFromStorage, saveTasksToStorage } from "@/lib/storage";
 import { useNotificationStore } from "@/stores/useNotificationstore";
+import type { EditableTaskFields } from "@/types/types";
 
 import Header from "@/components/header/header";
 import TaskList from "@/components/tasks/tasklist";
@@ -184,7 +185,7 @@ const AllTasks = () => {
             onEditChange={(id, field, value) =>
               setEditForms((prev) => ({
                 ...prev,
-                [id]: { ...prev[id], [field]: value },
+                [id]: { ...prev[id], [field]: value } as EditableTaskFields,
               }))
             }
             onSaveEdit={handleSaveEdit}

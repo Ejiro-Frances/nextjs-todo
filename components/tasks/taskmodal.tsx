@@ -93,7 +93,7 @@ const TaskFormModal: React.FC<Props> = ({
     defaultValues: {
       name: "",
       description: "",
-      tags: [],
+      tags: "",
       priority: "LOW",
     } as CreateTaskRequest,
     onSubmit: async ({ value }) => {
@@ -101,7 +101,7 @@ const TaskFormModal: React.FC<Props> = ({
         const taskData = {
           name: value.name?.trim() || "",
           description: value.description?.trim() || null,
-          tags: value.tags && value.tags.length > 0 ? value.tags : null,
+          tags: value.tags?.trim() || null,
           priority: value.priority || "LOW",
           status: "TODO" as Status,
           archived: false,
@@ -239,15 +239,8 @@ const TaskFormModal: React.FC<Props> = ({
                       <input
                         id={field.name}
                         name={field.name}
-                        value={field.state.value?.join(", ") || ""}
-                        onChange={(e) =>
-                          field.handleChange(
-                            e.target.value
-                              .split(",")
-                              .map((t) => t.trim())
-                              .filter(Boolean)
-                          )
-                        }
+                        value={field.state.value || ""}
+                        onChange={(e) => field.handleChange(e.target.value)}
                         placeholder="e.g., work, personal"
                         className="w-full p-2 border rounded-md mt-1 bg-transparent"
                       />

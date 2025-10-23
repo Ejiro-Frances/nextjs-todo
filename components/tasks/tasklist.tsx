@@ -3,21 +3,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/services/taskservices";
-import type { Task } from "@/types/types";
+import type { Task, EditableTaskFields } from "@/types/types";
 import TaskItem from "./taskitem";
 
-type EditableTaskFields = {
-  name: string;
-  description: string | null;
-  priority: Task["priority"];
-  status: Task["status"];
-  tags: string[] | null;
-};
+// Remove the local EditableTaskFields type since we're importing it from types
 
 type Props = {
   tasks?: Task[]; // Optional if fetched from API instead of passed down
   editingTaskId: string | null;
-  editForms: Record<string, EditableTaskFields>;
+  editForms: Partial<Record<string, EditableTaskFields>>;
   onEditChange: (
     id: string,
     field: keyof EditableTaskFields,
@@ -73,7 +67,13 @@ export const TaskList: React.FC<Props> = ({
               key={task.id}
               task={task}
               isEditing={editingTaskId === task.id}
-              editForm={editForms[task.id]}
+              editForm={editForms[task.id] || {
+                name: task.name,
+                description: task.description,
+                priority: task.priority,
+                status: task.status,
+                tags: task.tags,
+              }}
               onChange={(field, value) => onEditChange(task.id, field, value)}
               onSave={() => onSaveEdit(task.id)}
               onCancel={onCancelEdit}
