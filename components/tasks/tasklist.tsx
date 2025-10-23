@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/services/taskservices";
 import type { Task } from "@/types/types";
-import { Button } from "../ui/button";
 import TaskItem from "./taskitem";
 
 type EditableTaskFields = {
@@ -53,7 +52,7 @@ export const TaskList: React.FC<Props> = ({
   updatingTaskId,
   deletingTaskId,
 }) => {
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
   const { data, isLoading, isError } = useTasks(page);
 
   if (isLoading) return <p className="text-center">Loading tasks...</p>;
@@ -61,7 +60,7 @@ export const TaskList: React.FC<Props> = ({
     return <p className="text-center text-red-500">Error fetching tasks.</p>;
 
   const fetchedTasks: Task[] = data?.data ?? [];
-  const meta = data?.meta;
+  // const meta = data?.meta;
 
   return (
     <div className="space-y-6">

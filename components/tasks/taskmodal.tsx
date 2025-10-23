@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { type AxiosError } from "axios";
+import { isAxiosError } from "axios";
 
-import { type CreateTaskRequest, type Priority } from "@/types/types";
+import type {
+  CreateTaskRequest,
+  Priority,
+  createTaskResponse,
+  Status,
+} from "@/types/types";
 
 import FieldInfo from "@/components/fieldinfo";
 
@@ -16,7 +21,7 @@ import {
 } from "@/components/ui/select";
 
 type Props = {
-  onCreateTask: (task: CreateTaskRequest) => Promise<any>;
+  onCreateTask: (task: CreateTaskRequest) => Promise<createTaskResponse>;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 };
@@ -28,58 +33,119 @@ const TaskFormModal: React.FC<Props> = ({
 }) => {
   const [error, setError] = useState<string>("");
 
-  const form = useForm<CreateTaskRequest>({
+  // const form = useForm<CreateTaskRequest>({
+  //   defaultValues: {
+  //     name: "",
+  //     description: "",
+  //     tags: [],
+  //     priority: "LOW",
+  //   },
+  //   onSubmit: async ({ value }) => {
+  //     try {
+  //       // Ensure all required fields are present and valid
+  //       const taskData = {
+  //         name: value.name?.trim() || "",
+  //         description: value.description?.trim() || null,
+  //         tags: value.tags && value.tags.length > 0 ? value.tags : null,
+  //         priority: value.priority || "LOW",
+  //         status: "TODO", // This must be included as a required field
+  //         archived: false,
+  //       };
+
+  //       // Validate required fields before sending
+  //       if (!taskData.name) {
+  //         setError("Task name is required");
+  //         return;
+  //       }
+
+  //       // Debug logging - remove this in production
+  //       console.log("Submitting task data:", taskData);
+
+  //       await onCreateTask(taskData);
+  //       setIsOpen(false);
+  //       form.reset();
+  //       setError("");
+  //     } catch (error) {
+  //       const err = error as AxiosError<{ message?: string; error?: any }>;
+
+  //       // Debug logging - remove this in production
+  //       console.error("Task creation error:", err.response?.data);
+
+  //       // Handle Zod validation errors specifically
+  //       let errorMessage = "Error creating task: ";
+  //       if (err.response?.data?.error?.issues) {
+  //         const zodErrors = err.response.data.error.issues
+  //           .map((issue: any) => `${issue.path.join(".")}: ${issue.message}`)
+  //           .join("; ");
+  //         errorMessage += zodErrors;
+  //       } else if (err.response?.data?.message) {
+  //         errorMessage += err.response.data.message;
+  //       } else {
+  //         errorMessage += err.message;
+  //       }
+
+  //       setError(errorMessage);
+  //     }
+  //   },
+  // });
+
+  const form = useForm({
     defaultValues: {
       name: "",
       description: "",
       tags: [],
       priority: "LOW",
-    },
+    } as CreateTaskRequest,
     onSubmit: async ({ value }) => {
       try {
-        // Ensure all required fields are present and valid
         const taskData = {
           name: value.name?.trim() || "",
           description: value.description?.trim() || null,
           tags: value.tags && value.tags.length > 0 ? value.tags : null,
           priority: value.priority || "LOW",
-          status: "TODO", // This must be included as a required field
+          status: "TODO" as Status,
           archived: false,
         };
 
-        // Validate required fields before sending
         if (!taskData.name) {
           setError("Task name is required");
           return;
         }
 
-        // Debug logging - remove this in production
-        console.log("Submitting task data:", taskData);
-
         await onCreateTask(taskData);
         setIsOpen(false);
         form.reset();
         setError("");
-      } catch (error) {
-        const err = error as AxiosError<{ message?: string; error?: any }>;
+      } catch (error: unknown) {
+        if (
+          isAxiosError<{
+            message?: string;
+            error?: { issues?: { path: string[]; message: string }[] };
+          }>(error)
+        ) {
+          // now 'error' is fully typed as AxiosError with a known data shape
+          const errData = error.response?.data;
 
-        // Debug logging - remove this in production
-        console.error("Task creation error:", err.response?.data);
+          let errorMessage = "Error creating task: ";
 
-        // Handle Zod validation errors specifically
-        let errorMessage = "Error creating task: ";
-        if (err.response?.data?.error?.issues) {
-          const zodErrors = err.response.data.error.issues
-            .map((issue: any) => `${issue.path.join(".")}: ${issue.message}`)
-            .join("; ");
-          errorMessage += zodErrors;
-        } else if (err.response?.data?.message) {
-          errorMessage += err.response.data.message;
+          if (errData?.error?.issues) {
+            const zodErrors = errData.error.issues
+              .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+              .join("; ");
+            errorMessage += zodErrors;
+          } else if (errData?.message) {
+            errorMessage += errData.message;
+          } else {
+            errorMessage += error.message;
+          }
+
+          setError(errorMessage);
         } else {
-          errorMessage += err.message;
+          // For non-Axios errors (e.g., network issues)
+          setError(
+            error instanceof Error ? error.message : "Unknown error occurred"
+          );
         }
-
-        setError(errorMessage);
       }
     },
   });

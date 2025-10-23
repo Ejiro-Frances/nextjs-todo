@@ -1,35 +1,38 @@
 import localforage from "localforage";
-import { type Task } from "@/types/types";
 import { toast } from "sonner";
+import type { TaskApiResponse } from "@/types/types";
 
 const TASKS_KEY = "cachedTasks";
 
-export const saveTasksToStorage = async (data: { data: Task[]; meta: any }) => {
+export const saveTasksToStorage = async (data: TaskApiResponse) => {
   try {
-    await localforage.setItem(TASKS_KEY, data);
+    await localforage.setItem<TaskApiResponse>(TASKS_KEY, data);
   } catch (error) {
-    toast.error(`Error saving tasks: ${error}`);
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    toast.error(`Error saving tasks: ${message}`);
   }
 };
 
-export const getTasksFromStorage = async (): Promise<{
-  data: Task[];
-  meta: any;
-} | null> => {
-  try {
-    const cached = await localforage.getItem(TASKS_KEY);
-
-    return cached as { data: Task[]; meta: any };
-  } catch (error) {
-    toast.error(`Error loading tasks: ${error}`);
-    return null;
-  }
-};
+export const getTasksFromStorage =
+  async (): Promise<TaskApiResponse | null> => {
+    try {
+      const cached = await localforage.getItem<TaskApiResponse>(TASKS_KEY);
+      return cached ?? null;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Error loading tasks: ${message}`);
+      return null;
+    }
+  };
 
 export const clearTasksFromStorage = async () => {
   try {
     await localforage.removeItem(TASKS_KEY);
   } catch (error) {
-    toast.error(`Error clearing tasks: ${error}`);
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    toast.error(`Error clearing tasks: ${message}`);
   }
 };

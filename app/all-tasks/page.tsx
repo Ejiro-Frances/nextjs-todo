@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/services/taskservices";
 import { useTaskOperations } from "@/hooks/useTaskOperations";
@@ -8,14 +9,16 @@ import { paginationConfig } from "@/constants/pagination-config";
 import { getTasksFromStorage, saveTasksToStorage } from "@/lib/storage";
 import { useNotificationStore } from "@/stores/useNotificationstore";
 
-import Header from "@/components/header";
+import Header from "@/components/header/header";
 import TaskList from "@/components/tasks/tasklist";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import TaskFilterButtons from "@/components/tasks/taskfilterbuttons";
 import PaginationControls from "@/components/paginationcontrols";
 import TaskFormModal from "@/components/tasks/taskmodal";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AllTasks = () => {
+  useAuthGuard({ requireAuth: true });
   const addNotification = useNotificationStore((s) => s.addNotification);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,13 +26,13 @@ const AllTasks = () => {
     "ALL" | "TODO" | "IN_PROGRESS" | "DONE"
   >("ALL");
 
+  // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [tasksPerPage, setTasksPerPage] = useState(
-    paginationConfig.DEFAULT_TASKS_PER_PAGE
-  );
+  const [tasksPerPage] = useState(paginationConfig.DEFAULT_TASKS_PER_PAGE);
 
   const {
     editingTask,
@@ -43,8 +46,8 @@ const AllTasks = () => {
     handleSaveEdit,
     handleCancelEdit,
     createMutation,
-    deleteMutation,
-    updateMutation,
+    // deleteMutation,
+    // updateMutation,
   } = useTaskOperations({
     page: currentPage,
     limit: tasksPerPage,
@@ -52,13 +55,13 @@ const AllTasks = () => {
     search: debouncedSearch,
   });
 
-  // ✅ Debounce search input
+  // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // ✅ Fetch tasks
+  // Fetch tasks with offline fallback
   const { data: taskResponse, isLoading } = useQuery({
     queryKey: [
       "tasks",
@@ -101,9 +104,34 @@ const AllTasks = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const tasks = taskResponse?.data ?? [];
+  const tasks = useMemo(() => taskResponse?.data ?? [], [taskResponse]);
   const meta = taskResponse?.meta;
 
+  // Compute status counts for filter buttons
+  const statusCounts = useMemo(() => {
+    const counts = {
+      ALL: tasks.length,
+      TODO: 0,
+      IN_PROGRESS: 0,
+      DONE: 0,
+    };
+    for (const task of tasks) {
+      if (task.status in counts) {
+        counts[task.status as keyof typeof counts]++;
+      }
+    }
+    return counts;
+  }, [tasks]);
+
+  // Handlers for search
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+  const handleClearSearch = () => {
+    setSearchQuery("");
+  };
+
+  // Paginated view
   const paginationData = useMemo(() => {
     return {
       currentTasks: tasks,
@@ -114,22 +142,32 @@ const AllTasks = () => {
   }, [tasks, meta]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-5 mt-20 md:mt-28">
       <Header />
 
-      {/* Add Task Button */}
-      <div className="flex justify-end m-10">
-        <Button onClick={() => setIsModalOpen(true)}>Add Task</Button>
-      </div>
+      <main className="py-10 w-full max-w-[95%] mx-auto">
+        {/* Add Task Button */}
+        <div className="fixed top-24 right-5 z-50 shadow-2xl backdrop-blur-3xl">
+          <Button onClick={() => setIsModalOpen(true)}>Add Task</Button>
+        </div>
 
-      {/* Add Task Modal */}
-      <TaskFormModal
-        onCreateTask={createMutation.mutateAsync}
-        isOpen={isModalOpen}
-        setIsOpen={setIsModalOpen}
-      />
+        {/* Filter + Search Bar */}
+        <TaskFilterButtons
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          counts={statusCounts}
+          searchQuery={searchQuery}
+          handleSearchChange={handleSearchChange}
+          handleClearSearch={handleClearSearch}
+        />
 
-      <main className="py-10 w-full">
+        {/* Add Task Modal */}
+        <TaskFormModal
+          onCreateTask={createMutation.mutateAsync}
+          isOpen={isModalOpen}
+          setIsOpen={setIsModalOpen}
+        />
+
         {/* Loading Skeleton */}
         {isLoading ? (
           Array.from({ length: 4 }).map((_, idx) => (

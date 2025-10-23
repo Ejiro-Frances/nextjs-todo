@@ -16,7 +16,7 @@ import { Input } from "../ui/input";
 
 const LoginForm = () => {
   const router = useRouter();
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser, setAccessToken, setRefreshToken } = useAuthStore();
 
   const {
     register,
@@ -34,6 +34,10 @@ const LoginForm = () => {
       toast.success(`Welcome back, ${data.user.name}!`);
       setUser(data.user);
       setAccessToken(data.accessToken);
+      setRefreshToken(data.refreshToken);
+      console.log("user", data.user);
+      console.log("acc", data.accessToken);
+      console.log("ref", data.refreshToken);
       reset();
     },
     onError: (error) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,10 +14,9 @@ import { Input } from "../ui/input";
 import { toast } from "sonner";
 
 import { useAuthStore } from "@/stores/authstore";
-import axios from "axios";
 
 export const SignupForm = () => {
-  const { setAccessToken, setUser } = useAuthStore();
+  const { setAccessToken, setRefreshToken, setUser } = useAuthStore();
   const router = useRouter();
 
   const {
@@ -34,7 +34,8 @@ export const SignupForm = () => {
       toast.success(`Welcome, ${data.user.name}!`);
       setUser(data.user);
       setAccessToken(data.accessToken);
-      console.log(data.accessToken);
+      setRefreshToken(data.refreshToken);
+      console.log(data.accessToken, data.refreshToken);
 
       router.push("/all-tasks");
       reset();

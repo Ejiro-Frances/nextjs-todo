@@ -1,5 +1,5 @@
 import React from "react";
-import { Loader, BadgeCheck } from "lucide-react";
+import { Loader, CircleCheck } from "lucide-react";
 
 import type { Status } from "@/types/types";
 
@@ -14,7 +14,7 @@ const TaskStatusBadge: React.FC<Props> = ({ status, label }) => {
       <p className="font-family-DM text-[#888888] text-sm mr-1.5">{label}</p>
       <div>
         {status === "DONE" ? (
-          <BadgeCheck className="fill-[#0EA420]" />
+          <CircleCheck className="fill-[#0EA420] text-white" />
         ) : (
           <Loader className="fill-[#F42D2D]" />
         )}

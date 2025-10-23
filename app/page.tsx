@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { Button } from "@/components/ui/button";
 
 import SignupForm from "@/components/auth/signupform";
 import LoginForm from "@/components/auth/loginform";
 
 export default function AuthPage() {
+  useAuthGuard({ requireAuth: false });
   const [activeTab, setActiveTab] = useState("login");
 
   return (
