@@ -90,6 +90,7 @@ const AllTasks = () => {
         });
         return response;
       } catch (error) {
+        console.error("Error fetching tasks:", error);
         const cached = await getTasksFromStorage();
         if (cached) {
           addNotification({

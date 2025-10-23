@@ -59,7 +59,7 @@ export default function TaskDetailsPage() {
           <div className="bg-red-50 border border-red-200 rounded-xl p-6">
             <h2 className="text-red-800 font-semibold mb-2">Task Not Found</h2>
             <p className="text-red-600">
-              The task you're looking for doesn't exist or has been deleted.
+              The task you&apos;re looking for doesn&apos;t exist or has been deleted.
             </p>
             {error && (
               <details className="mt-4">
